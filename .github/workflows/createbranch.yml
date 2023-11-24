@@ -1,0 +1,20 @@
+name: Branch Creation Workflow
+
+on:
+  create:
+    branches:
+      - '**'
+
+jobs:
+  branch-creation-job:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - name: Display Information
+      run: |
+        echo "New branch created: ${{ github.event.ref }}"
+        echo "Repository: ${{ github.repository }}"
+        echo "Repository Owner: ${{ github.repository_owner }}"
