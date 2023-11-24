@@ -1,10 +1,10 @@
-name: Create custom build
+name: Create A new Branch
 
 on:
   workflow_dispatch:
     inputs:
-      customerName:
-        description: Add the name of the customer for this build
+      BranchName:
+        description: Name of the New branch
         type: string
         required: true
       isPremium:
@@ -21,7 +21,7 @@ on:
           - "high-contrast"
     
 jobs:
-  build-artifact:
+  Create-Branch:
     runs-on: ubuntu-latest
 
     steps:
