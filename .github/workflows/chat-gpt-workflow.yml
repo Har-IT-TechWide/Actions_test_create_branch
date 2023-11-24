@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch_name:
-        description: 'Chat-gpt'
+        description: 'Name of the branch to create'
         required: true
 
 jobs:
