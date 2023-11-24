@@ -6,6 +6,4 @@ jobs:
   do-something:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
       - run: echo "Hello! I've been triggered manually!"
