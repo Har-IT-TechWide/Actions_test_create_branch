@@ -1,20 +1,23 @@
 name: Branch Creation Workflow
 
 on:
-  create:
-    branches:
-      - '**'
+  pull_request:
+    types: [opened]
 
 jobs:
   branch-creation-job:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-      
-    - name: Display Information
-      run: |
-        echo "New branch created: ${{ github.event.ref }}"
-        echo "Repository: ${{ github.repository }}"
-        echo "Repository Owner: ${{ github.repository_owner }}"
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Create a branch
+        uses: planetscale/create-branch-action@v1
+        id: create_branch
+        with:
+          # org_name: bmorrison-ps
+          # database_name: recipes_db
+          branch_name: mynewbranch
+          from: main
+        env:
+          GIT_HUB_PAT: ${{ secrets.GIT_HUB_PAT }}
+          GIT_HUB_USER: ${{ secrets.GIT_HUB_USER }}
