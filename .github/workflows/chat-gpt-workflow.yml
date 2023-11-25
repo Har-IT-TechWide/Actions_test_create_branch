@@ -3,7 +3,7 @@ name: Create Branch on Workflow Dispatch
 on:
   workflow_dispatch:
     inputs:
-      branch_name:
+      bbranchName:
         description: 'Name of the branch to create'
         required: true
 
