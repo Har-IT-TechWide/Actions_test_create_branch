@@ -24,10 +24,10 @@ jobs:
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         
         # Check if the provided branch name is 'main'
-        if [ "$NEW_BRANCH_NAME" != "main" ]; then
-          echo "Invalid branch name. Only 'main' branch is allowed for this workflow."
-          exit 1
-        fi
+        # if [ "$NEW_BRANCH_NAME" != "main" ]; then
+        #   echo "Invalid branch name. Only 'main' branch is allowed for this workflow."
+        #   exit 1
+        # fi
         
         # Continue with the workflow if the branch name is 'main'
         echo "Creating branch: $NEW_BRANCH_NAME"
