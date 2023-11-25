@@ -3,34 +3,22 @@ name: Create Branch on Workflow Dispatch
 on:
   workflow_dispatch:
     inputs:
-      bbranchName:
-        description: 'Name of the branch to create'
+      branchName:
+        description: 'Name of the new branch'
         required: true
 
 jobs:
-  create_branch:
+  create-branch-job:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v2
-    - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-    - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-    - name: Create branch
+      
+    - name: Create and Push Branch
       run: |
-        # git checkout -b ${{ github.event.inputs.branch_name }}
-        # git push origin ${{ github.event.inputs.branch_name }}
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-        
-        # Check if the provided branch name is 'main'
-        # if [ "$NEW_BRANCH_NAME" != "main" ]; then
-        #   echo "Invalid branch name. Only 'main' branch is allowed for this workflow."
-        #   exit 1
-        # fi
-        
-        # Continue with the workflow if the branch name is 'main'
-        echo "Creating branch: $NEW_BRANCH_NAME"
         
         # Create a new branch based on the master branch
         git checkout -b $NEW_BRANCH_NAME
