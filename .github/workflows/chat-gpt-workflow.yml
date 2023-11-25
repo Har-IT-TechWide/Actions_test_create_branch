@@ -39,3 +39,9 @@ jobs:
         
         # Push the new branch to the repository
         git push origin $NEW_BRANCH_NAME
+
+        git checkout -b develop
+
+        git merge main
+
+        git push
