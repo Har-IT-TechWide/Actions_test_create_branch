@@ -23,7 +23,7 @@ jobs:
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         
-        # Check if the provided branch name is 'master'
+        # Check if the provided branch name is 'main'
         if [ "$NEW_BRANCH_NAME" != "main" ]; then
           echo "Invalid branch name. Only 'main' branch is allowed for this workflow."
           exit 1
@@ -39,9 +39,3 @@ jobs:
         
         # Push the new branch to the repository
         git push origin $NEW_BRANCH_NAME
-
-        git checkout -b develop
-
-        git merge main
-
-        git push
