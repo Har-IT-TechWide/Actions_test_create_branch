@@ -63,6 +63,5 @@ jobs:
           console.log(`Pull request created: ${response.data.html_url}`);
       env:
         INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
-      with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
