@@ -3,7 +3,7 @@ name: CBRPR
 on:
   workflow_dispatch:
     inputs:
-      branchName: release
+      branchName:
         description: 'Name of the new branch Eg: release/DDMMYY'
         type : string
 
