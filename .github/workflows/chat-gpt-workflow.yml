@@ -40,3 +40,15 @@ jobs:
         
         # Push the new branch to the repository
         git push origin $NEW_BRANCH_NAME
+
+        # Merge from master to creaed branch for resolve issues
+        git merge master
+
+        git push origin $NEW_BRANCH_NAME
+
+        # checkout to the master
+        git checkout master
+
+        # merge in to master from develop
+        git merge $NEW_BRANCH_NAME
+
