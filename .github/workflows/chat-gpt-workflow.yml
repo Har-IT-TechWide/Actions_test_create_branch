@@ -40,25 +40,17 @@ jobs:
         
         # Push the new branch to the repository
         git push origin $NEW_BRANCH_NAME
-        
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - name: Raise PR 1
+      id: demo-1
+      uses: peter-evans/create-pull-request@v3
       with:
-        python-version: "3.8"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Update available cloud list
-      run: make cloud-list
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v4
-      with:
-        commit-message: Cloud - Update available list
-        title: Cloud - Update available list
-        body: Cloud - Update available list
-        base: main
-        labels: automated-pr, Clouds & Regions
         branch: $NEW_BRANCH_NAME
+        base: main
+        title: "demo for auto pr2"
+        # committer: ${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}">
+        # author: ${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}">
+        body:
+          This is to show automatic PR creation
+        # token: ${{ secrets.GIT_HUB_PAT }}
         delete-branch: false
 
