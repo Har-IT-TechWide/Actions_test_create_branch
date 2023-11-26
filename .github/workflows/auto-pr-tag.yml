@@ -38,7 +38,7 @@ jobs:
       id: version
       run: |
         # Extract version from your code (replace this with the actual command)
-        VERSION=$(cat version.txt | grep 'artifactory_version' | cut -d'=' -f2)
+        VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
 
         echo "Version: $VERSION"
         echo "::set-output name=version::$VERSION"
