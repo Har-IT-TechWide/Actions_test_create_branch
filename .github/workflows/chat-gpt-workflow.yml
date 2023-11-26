@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  create-branch-job:
+  create-branch-and-pr:
     runs-on: ubuntu-latest
     
     steps:
@@ -19,12 +19,17 @@ jobs:
     
     - run: echo "🖥️ The workflow is now ready to test your code on the runner."
   
-    - name: Check Out Master
+    - name: Set up Git
+      run: |
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+    - name: Check Out Main
       run: |
         git checkout main
         git pull origin main
 
-    - name: Create Branch
+    - name: Create and Push Branch
       run: |
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
@@ -37,8 +42,7 @@ jobs:
         
         # Make changes or perform other actions if needed
 
-        git config --global user.email "harittechwide@gmail.com"
-        git config --global user.name "Har-IT-TechWide"
+
 
         # Commit changes
         # git commit -am "Add changes to $NEW_BRANCH_NAME"
@@ -47,24 +51,10 @@ jobs:
         git push origin $NEW_BRANCH_NAME
 
     - name: Create Pull Request
-      uses: actions/github-script@v7
+      uses: peter-evans/create-pull-request@v3
       with:
-        script: |
-          const newBranchName = process.env.INPUT_BRANCHNAME;
-          const title = `Pull Request for ${newBranchName}`;
-          const body = `This pull request includes changes from the branch ${newBranchName}.\n\nPlease review and merge.`;
-          
-          const response = await github.pulls.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: title,
-            body: body,
-            head: newBranchName,
-            base: 'main'
-          });
-          
-          console.log(`Pull request created: ${response.data.html_url}`);
-      env:
-        INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.event.inputs.branchName }}
+        commit-message: "Create branch: ${{ github.event.inputs.branchName }}"
+        title: "Create branch: ${{ github.event.inputs.branchName }}"
+        body: "This pull request was automatically created by GitHub Actions."
 
