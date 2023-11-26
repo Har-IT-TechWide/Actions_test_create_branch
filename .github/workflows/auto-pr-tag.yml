@@ -1,4 +1,4 @@
-name: CBRPR
+name: ATRPR
 
 on:
   workflow_dispatch:
