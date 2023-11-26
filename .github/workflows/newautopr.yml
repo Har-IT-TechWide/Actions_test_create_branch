@@ -3,10 +3,10 @@ name: CBRPR
 on:
   workflow_dispatch:
     inputs:
-      branchName: 
+      branchName: release
         description: 'Name of the new branch Eg: release/DDMMYY'
         type : string
-        
+
         required: true
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
         
     - name: Create Pull Request
       run: |
-        gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Create branch: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions."
+        gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
       env:
             # INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
         GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
