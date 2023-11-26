@@ -19,6 +19,14 @@ jobs:
     
     - run: echo "🖥️ The workflow is now ready to test your code on the runner."
     
+    - name: Display Repository Owner
+      run: echo "Repository Owner: ${{ github.repository_owner }}"
+      
+    - name: Use Repository Owner in a Script
+      run: |
+        REPO_OWNER="${{ github.repository_owner }}"
+        echo "Repository Owner in script: $REPO_OWNER"
+
     - name: Check Out Master
       run: |
         git checkout main
