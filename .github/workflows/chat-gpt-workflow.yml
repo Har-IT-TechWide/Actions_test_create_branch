@@ -37,6 +37,9 @@ jobs:
         
         # Make changes or perform other actions if needed
 
+        git config --global user.email "harittechwide@gmail.com"
+        git config --global user.name "Har-IT-TechWide"
+
         # Commit changes
         git commit -am "Add changes to $NEW_BRANCH_NAME"
         
