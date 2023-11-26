@@ -3,8 +3,10 @@ name: CBRPR
 on:
   workflow_dispatch:
     inputs:
-      branchName:
-        description: 'Name of the new branch'
+      branchName: 
+        description: 'Name of the new branch Eg: release/DDMMYY'
+        type : string
+        
         required: true
 
 jobs:
