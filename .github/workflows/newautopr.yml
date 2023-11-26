@@ -36,3 +36,6 @@ jobs:
     - name: Create Pull Request
       run: |
         gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Create branch: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions."
+      env:
+            # INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
+        token: ${{ secrets.GIT_HUB_PAT }}
