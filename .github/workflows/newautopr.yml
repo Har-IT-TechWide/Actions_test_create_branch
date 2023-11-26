@@ -1,0 +1,95 @@
+name: Create Branch and Raise Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      branchName:
+        description: 'Name of the new branch'
+        required: true
+
+jobs:
+  create-branch-and-pr:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    
+    - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+    
+    - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+  
+    - name: Set up Git
+      run: |
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+    # - name: Check Out Main
+    #   run: |
+    #     git checkout main
+    #     git pull origin main
+
+    - name: Create and Push Branch
+      run: |
+        # Get the new branch name from the workflow input
+        NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
+        
+        # Continue with the workflow if the branch name is 'main'
+        echo "Creating branch: $NEW_BRANCH_NAME"
+
+        # Create a new branch based on the master branch
+        git checkout -b $NEW_BRANCH_NAME
+        
+        # Make changes or perform other actions if needed
+
+
+
+        # Commit changes
+        # git commit -am "Add changes to $NEW_BRANCH_NAME"
+        
+        # Push the new branch to the repository
+        git push origin $NEW_BRANCH_NAME
+
+    # - name: Create Pull Request
+    #   uses: peter-evans/create-pull-request@v3
+    #   with:
+    #     branch: ${{ github.event.inputs.branchName }}
+    #     base: main
+    #     commit-message: "Create branch: ${{ github.event.inputs.branchName }}"
+    #     title: "Create branch: ${{ github.event.inputs.branchName }}"
+    #     body: "This pull request was automatically created by GitHub Actions."
+    #     token: ${{ secrets.GIT_HUB_PAT }}
+
+name: Demo to create automatic PR
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  updateAuthor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checking out code
+        uses: actions/checkout@v2
+
+      - name: extract git commit data
+        uses: rlespinasse/git-commit-data-action@v1.x
+
+    #   - name: Update author information
+    #     run: echo ${{ env.GIT_COMMIT_AUTHOR_NAME }} > AUTHOR
+
+      - name: Raise PR 1
+        id: demo-1
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: ${{ github.event.inputs.branchName }}
+          base: main
+          title: "demo for auto pr1"
+        #   committer: ${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}">
+        #   author: ${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}">
+          body:
+            This is to show automatic PR creation
+          token: ${{ secrets.GIT_HUB_PAT }}
+          delete-branch: false
