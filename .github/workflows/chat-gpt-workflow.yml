@@ -24,10 +24,10 @@ jobs:
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
 
-    - name: Check Out Main
-      run: |
-        git checkout main
-        git pull origin main
+    # - name: Check Out Main
+    #   run: |
+    #     git checkout main
+    #     git pull origin main
 
     - name: Create and Push Branch
       run: |
