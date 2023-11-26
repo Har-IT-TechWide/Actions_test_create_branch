@@ -1,4 +1,4 @@
-name: Create Branch and Raise Pull Request
+name: CBRPR
 
 on:
   workflow_dispatch:
