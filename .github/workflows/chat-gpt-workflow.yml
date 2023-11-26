@@ -55,7 +55,7 @@ jobs:
       with:
         branch: ${{ github.event.inputs.branchName }}
         base: main
-        commit-message: "change me for commit message"
-        title: ""auto pr release to main""
+        commit-message: "Create branch: ${{ github.event.inputs.branchName }}"
+        title: "Create branch: ${{ github.event.inputs.branchName }}"
         body: "This pull request was automatically created by GitHub Actions."
 
