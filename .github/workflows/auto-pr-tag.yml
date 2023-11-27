@@ -40,17 +40,16 @@ jobs:
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         # Create a new branch based on the main branch
         git checkout -b $NEW_BRANCH_NAME
-        
         # Make changes or perform other actions if needed
-        
         # Push the new branch to the repository
         git push origin $NEW_BRANCH_NAME
-        else
-      run: |
-        NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-        # If the branch already exists, checkout and update it
-        git checkout $NEW_BRANCH_NAME
-        git pull origin $NEW_BRANCH_NAME
+      else:
+        run: |
+          NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
+          # If the branch already exists, checkout and update it
+          git checkout $NEW_BRANCH_NAME
+          git pull origin $NEW_BRANCH_NAME
+
     - name: Get Version from Code
       id: version
       run: |
