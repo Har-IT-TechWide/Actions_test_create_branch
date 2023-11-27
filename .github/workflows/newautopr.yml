@@ -38,24 +38,25 @@ jobs:
           echo "::set-output name=branch_exists::false"
         fi
     
-    # - name: Create or Update Branch
-    #   run: |
-    #     NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-    #     if [ "${{ steps.check_branch.outputs.branch_exists }}" == 'false' ]; then
-    #       # Create a new branch based on the main branch
-    #       git checkout -b $NEW_BRANCH_NAME
+    - name: Create or Update Branch
+      run: |
+        NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
+        if [ "${{ steps.check_branch.outputs.branch_exists }}" == 'false' ]; then
+          # Create a new branch based on the main branch
+          git checkout -b $NEW_BRANCH_NAME origin/main
+          # Make changes or perform other actions if needed
+          # Push the new branch to the repository
+          git push origin $NEW_BRANCH_NAME
+        else
+          # If the branch already exists, fetch, checkout, pull, and update it
+          git fetch origin main
+          git checkout $NEW_BRANCH_NAME
+          git merge origin/main
+          git push origin $NEW_BRANCH_NAME
+        fi
 
-    #       # Make changes or perform other actions if needed
-    #       # Push the new branch to the repository
-    #       git push origin $NEW_BRANCH_NAME
-    #     else
-    #       # If the branch already exists, fetch, checkout, and update it
-    #       git fetch origin $NEW_BRANCH_NAME
-    #       git checkout $NEW_BRANCH_NAME
-    #       git pull origin $NEW_BRANCH_NAME
-    #       git push origin $NEW_BRANCH_NAME
-    #     fi
-
+    - name: List Existing Branches (After)
+      run: git branch -a
     # - name: Get Version from Code
     #   id: version
     #   run: |
