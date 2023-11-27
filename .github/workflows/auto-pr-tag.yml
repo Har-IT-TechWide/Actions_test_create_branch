@@ -23,7 +23,7 @@ jobs:
     
     - name: Fetch All Branches
       run: |
-      git fetch --prune --tags --force origin '+refs/heads/*:refs/remotes/origin/*'
+        git fetch --prune --tags --force origin '+refs/heads/*:refs/remotes/origin/*'
     
     - name: Update Existing Branch or Create New Branch
       run: |
