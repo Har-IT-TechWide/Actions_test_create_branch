@@ -21,18 +21,12 @@ jobs:
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
     
-    # - name: Fetch All Branches
-    #   run: |
-    #     git fetch --prune --tags --force origin '+refs/heads/*:refs/remotes/origin/*'
     
     - name: Update Existing Branch or Create New Branch
       run: |
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         BASE_BRANCH="develop" # Change this to the desired base branch
-        # # Get the new branch name from the workflow input
-        # NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-        # BASE_BRANCH="develop" # Change this to the desired base branch
 
         # Check if the branch already exists
         if git rev-parse --verify "refs/heads/$NEW_BRANCH_NAME" >/dev/null 2>&1; then
@@ -83,7 +77,8 @@ jobs:
         # Create a tag based on the version
         git tag -a "v$VERSION" -m "Version $VERSION"
 
-        # Push the tag to the repository
+        # Push the tag to the repository and delete the existing remote tag
+        git push origin "v$VERSION" --delete "v$VERSION"
         git push origin "v$VERSION"
 
 
@@ -108,30 +103,11 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
 
-    # - name: Get Version from Code
-    #   id: version
-    #   run: |
-    #     # Extract version from your code (replace this with the actual command)
-    #     VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
 
-    #     echo "Version: $VERSION"
-    #     echo "::set-output name=version::$VERSION"
-    
-    # - name: Create Tag and Push
-    #   run: |
-    #     # Get the version from the previous step
-    #     VERSION="${{ steps.version.outputs.version }}"
-        
-    #     # Create a tag based on the version
-    #     git tag -a "v$VERSION" -m "Version $VERSION"
-        
-    #     # Push the tag to the repository
-    #     git push origin "v$VERSION"
 
     - name: Create Pull Request
       if: steps.check-pr.outputs.prExists != 'true'
       run: |
         gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
       env:
-            # INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
         GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
