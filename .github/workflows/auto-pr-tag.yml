@@ -47,6 +47,48 @@ jobs:
         fi
         
         # Make changes or perform other actions if needed
+
+    - name: Check if Tag exists
+      id: check-tag
+      run: |
+        # Get the version from the previous step
+        VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
+
+        # Check if the tag already exists
+        if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+          echo "Tag v$VERSION already exists. Deleting the existing tag."
+          git tag -d "v$VERSION"
+          git push --delete origin "v$VERSION"
+          echo "::set-output name=tagExists::true"
+        else
+          echo "No existing tag found for v$VERSION."
+          echo "::set-output name=tagExists::false"
+        fi
+
+    - name: Get Version from Code
+      id: version
+      run: |
+        # Extract version from your code (replace this with the actual command)
+        VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
+
+        echo "Version: $VERSION"
+        echo "::set-output name=version::$VERSION"
+
+    - name: Create Tag and Push
+      if: steps.check-tag.outputs.tagExists != 'true'
+      run: |
+        # Get the version from the previous step
+        VERSION="${{ steps.version.outputs.version }}"
+
+        # Create a tag based on the version
+        git tag -a "v$VERSION" -m "Version $VERSION"
+
+        # Push the tag to the repository
+        git push origin "v$VERSION"
+
+
+
+
     - name: Check if PR exists
       id: check-pr
       run: |
@@ -66,25 +108,25 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
 
-    - name: Get Version from Code
-      id: version
-      run: |
-        # Extract version from your code (replace this with the actual command)
-        VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
+    # - name: Get Version from Code
+    #   id: version
+    #   run: |
+    #     # Extract version from your code (replace this with the actual command)
+    #     VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
 
-        echo "Version: $VERSION"
-        echo "::set-output name=version::$VERSION"
+    #     echo "Version: $VERSION"
+    #     echo "::set-output name=version::$VERSION"
     
-    - name: Create Tag and Push
-      run: |
-        # Get the version from the previous step
-        VERSION="${{ steps.version.outputs.version }}"
+    # - name: Create Tag and Push
+    #   run: |
+    #     # Get the version from the previous step
+    #     VERSION="${{ steps.version.outputs.version }}"
         
-        # Create a tag based on the version
-        git tag -a "v$VERSION" -m "Version $VERSION"
+    #     # Create a tag based on the version
+    #     git tag -a "v$VERSION" -m "Version $VERSION"
         
-        # Push the tag to the repository
-        git push origin "v$VERSION"
+    #     # Push the tag to the repository
+    #     git push origin "v$VERSION"
 
     - name: Create Pull Request
       if: steps.check-pr.outputs.prExists != 'true'
