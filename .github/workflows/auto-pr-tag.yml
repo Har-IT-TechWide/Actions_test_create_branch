@@ -30,9 +30,9 @@ jobs:
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         BASE_BRANCH="develop" # Change this to the desired base branch
-        # Get the new branch name from the workflow input
-        NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-        BASE_BRANCH="develop" # Change this to the desired base branch
+        # # Get the new branch name from the workflow input
+        # NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
+        # BASE_BRANCH="develop" # Change this to the desired base branch
 
         # Check if the branch already exists
         if git rev-parse --verify "refs/heads/$NEW_BRANCH_NAME" >/dev/null 2>&1; then
