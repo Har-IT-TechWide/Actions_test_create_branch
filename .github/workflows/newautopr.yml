@@ -1,16 +1,14 @@
-name: CBRPR
+name: Create Branch, Tag Release, and Raise Pull Request
 
 on:
   workflow_dispatch:
     inputs:
       branchName:
-        description: 'Name of the new branch Eg: release/DDMMYY'
-        type : string
-
+        description: 'Name of the new branch'
         required: true
 
 jobs:
-  create-branch-and-pr:
+  create-branch-tag-and-pr:
     runs-on: ubuntu-latest
     
     steps:
@@ -22,22 +20,65 @@ jobs:
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
         
-    - name: Create and Push Branch
+    - name: Check if Branch Exists
+      id: check_branch
       run: |
-        # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-        
-        # Create a new branch based on the main branch
-        git checkout -b $NEW_BRANCH_NAME
-        
-        # Make changes or perform other actions if needed
-        
-        # Push the new branch to the repository
-        git push origin $NEW_BRANCH_NAME
-        
+        if git show-ref --quiet "refs/heads/$NEW_BRANCH_NAME"; then
+          echo "Branch $NEW_BRANCH_NAME already exists."
+          echo "::set-output name=branch_exists::true"
+        else
+          echo "Branch $NEW_BRANCH_NAME does not exist."
+          echo "::set-output name=branch_exists::false"
+        fi
+    
+    - name: Create or Update Branch
+      run: |
+        NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
+        if [ "${{ steps.check_branch.outputs.branch_exists }}" == 'false' ]; then
+          # Create a new branch based on the main branch
+          git checkout -b $NEW_BRANCH_NAME
+          # Make changes or perform other actions if needed
+          # Push the new branch to the repository
+          git push origin $NEW_BRANCH_NAME
+        else
+          # If the branch already exists, checkout and update it
+          git checkout $NEW_BRANCH_NAME
+          git pull origin $NEW_BRANCH_NAME
+        fi
+
+    - name: Get Version from Code
+      id: version
+      run: |
+        # Extract version from your code (replace this with the actual command)
+        VERSION=$(cat version.txt)
+        echo "Version: $VERSION"
+        echo "::set-output name=version::$VERSION"
+
+    - name: Check if Tag Exists
+      id: check_tag
+      run: |
+        TAG_NAME="v${{ steps.version.outputs.version }}"
+        if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+          echo "Tag $TAG_NAME already exists. Deleting..."
+          git tag -d "$TAG_NAME"
+          git push origin --delete "$TAG_NAME"
+          echo "::set-output name=tag_exists::true"
+        else
+          echo "Tag $TAG_NAME does not exist."
+          echo "::set-output name=tag_exists::false"
+        fi
+
+    - name: Create Tag and Push
+      if: steps.check_tag.outputs.tag_exists == 'false'
+      run: |
+        # Get the version from the previous step
+        VERSION="${{ steps.version.outputs.version }}"
+        # Create a tag based on the version
+        git tag -a "v$VERSION" -m "Version $VERSION"
+        # Push the tag to the repository
+        git push origin "v$VERSION"
+
     - name: Create Pull Request
       run: |
-        gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
-      env:
-            # INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
-        GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
+        gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Create/Update branch: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions."
