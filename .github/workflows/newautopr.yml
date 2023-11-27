@@ -37,7 +37,7 @@ jobs:
         # Make changes or perform other actions if needed
         
         # Push the new branch to the repository
-        git push origin $NEW_BRANCH_NAME
+        git push origin $NEW_BRANCH_NAME --set-upstream $NEW_BRANCH_NAME
 
     - name: Get Version from Code
       id: version
@@ -61,7 +61,7 @@ jobs:
 
     - name: Create Pull Request
       run: |
-        gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
+        gh pr create --base main --head $NEW_BRANCH_NAME --title "Create branch: $NEW_BRANCH_NAME" --body "This pull request was automatically created by GitHub Actions."
       env:
             # INPUT_BRANCHNAME: ${{ github.event.inputs.branchName }}
         GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
