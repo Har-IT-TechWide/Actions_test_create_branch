@@ -25,22 +25,14 @@ jobs:
       run: |
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
-        BASE_BRANCH="develop" # Change this to the desired base branch
         
-        # Check if the branch already exists
-        if git rev-parse --verify $NEW_BRANCH_NAME >/dev/null 2>&1; then
-          echo "Branch $NEW_BRANCH_NAME already exists. Updating with the latest changes from $BASE_BRANCH."
-          git checkout $NEW_BRANCH_NAME
-          git pull origin $BASE_BRANCH
-        else
-          echo "Creating a new branch: $NEW_BRANCH_NAME based on $BASE_BRANCH."
-          git checkout -b $NEW_BRANCH_NAME $BASE_BRANCH
-        fi
+        # Create a new branch based on the main branch
+        git checkout -b $NEW_BRANCH_NAME
         
         # Make changes or perform other actions if needed
         
         # Push the new branch to the repository
-        git push origin $NEW_BRANCH_NAME --force
+        git push origin $NEW_BRANCH_NAME
 
     - name: Get Version from Code
       id: version
