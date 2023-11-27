@@ -4,7 +4,6 @@ on:
     inputs:
       branchName:
         description: 'Name of the new branch Eg: release/DDMMYY'
-        type : string
 
         required: true
 
@@ -23,21 +22,23 @@ jobs:
         
     - name: Create and Push Branch
       run: |
+        # Ensure we are on the default branch (main, master, etc.)
+        git checkout main
         # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         
         # Delete the branch if it exists
-        git rev-parse --verify $NEW_BRANCH_NAME && git branch -D $NEW_BRANCH_NAME || echo "Branch $NEW_BRANCH_NAME does not exist."
+        git branch -D $NEW_BRANCH_NAME || echo "Branch $NEW_BRANCH_NAME does not exist."
 
     - name: Create and Push Branch
       run: |
-        # Create a new branch based on the main branch
+        # Create a new branch based on the default branch
         git checkout -b $NEW_BRANCH_NAME
         
         # Make changes or perform other actions if needed
         
         # Push the new branch to the repository
-        git push origin $NEW_BRANCH_NAME --set-upstream $NEW_BRANCH_NAME
+        git push origin $NEW_BRANCH_NAME --force
 
     - name: Get Version from Code
       id: version
