@@ -1,4 +1,4 @@
-name: Create Branch, Tag Release, and Raise Pull Request
+name: testyaml
 
 on:
   workflow_dispatch:

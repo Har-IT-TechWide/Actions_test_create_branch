@@ -1,4 +1,4 @@
-name: Create Branch, Tag, and Raise PR
+name: GPT1
 on:
   workflow_dispatch:
     inputs:
