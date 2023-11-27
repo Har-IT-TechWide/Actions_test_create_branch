@@ -1,4 +1,4 @@
-name: ATRPR-1
+name: ATRPR
 on:
   workflow_dispatch:
     inputs:
