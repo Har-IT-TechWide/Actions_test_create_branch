@@ -1,5 +1,4 @@
-name: Create Branch, Tag Release, and Raise Pull Request
-
+name: Create Branch, Tag, and Raise PR
 on:
   workflow_dispatch:
     inputs:
