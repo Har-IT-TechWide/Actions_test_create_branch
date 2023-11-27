@@ -47,22 +47,24 @@ jobs:
         fi
         
         # Make changes or perform other actions if needed
-        # # Check if the branch already exists
-        # if git rev-parse --verify "refs/heads/$NEW_BRANCH_NAME" >/dev/null 2>&1; then
-        #   echo "Branch $NEW_BRANCH_NAME already exists. Updating with the latest changes from $BASE_BRANCH."
-        #   git checkout $NEW_BRANCH_NAME
-        #   git pull origin $BASE_BRANCH
-        #   git push origin $NEW_BRANCH_NAME --force
-        # else
-        #   echo "Creating a new branch: $NEW_BRANCH_NAME based on $BASE_BRANCH."
-        #   git checkout -b $NEW_BRANCH_NAME $BASE_BRANCH
-        #   git push origin $NEW_BRANCH_NAME --force
-        # fi
-        
-        # # Make changes or perform other actions if needed
-        
-        # # Push the new branch to the repository
-        # git push origin $NEW_BRANCH_NAME --force
+    - name: Check if PR exists
+      id: check-pr
+      run: |
+        # Get the new branch name from the workflow input
+        NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
+
+        # Check if a pull request already exists for the branch
+        PR_EXISTS=$(gh pr list --base main --head "$NEW_BRANCH_NAME" --json number -q '.[].number')
+
+        if [ -n "$PR_EXISTS" ]; then
+          echo "Pull request already exists for $NEW_BRANCH_NAME. PR Number: $PR_EXISTS"
+          echo "::set-output name=prExists::true"
+        else
+          echo "No existing pull request found for $NEW_BRANCH_NAME."
+          echo "::set-output name=prExists::false"
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
 
     - name: Get Version from Code
       id: version
@@ -85,6 +87,7 @@ jobs:
         git push origin "v$VERSION"
 
     - name: Create Pull Request
+      if: steps.check-pr.outputs.prExists != 'true'
       run: |
         gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
       env:
