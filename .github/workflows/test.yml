@@ -11,6 +11,12 @@ jobs:
   create-branch-and-pr:
     runs-on: ubuntu-latest
     
+    outputs:
+      id: outputs
+      value:
+        tagExists: false
+        version: ''
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -22,11 +28,9 @@ jobs:
     
     - name: Update Existing Branch or Create New Branch
       run: |
-        # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
         BASE_BRANCH="develop" # Change this to the desired base branch
 
-        # Check if the branch already exists
         if git rev-parse --verify "refs/heads/$NEW_BRANCH_NAME" >/dev/null 2>&1; then
           echo "Branch $NEW_BRANCH_NAME already exists. Updating with the latest changes from $BASE_BRANCH."
           git checkout $NEW_BRANCH_NAME
@@ -41,60 +45,48 @@ jobs:
     - name: Check if Tag exists
       id: check-tag
       run: |
-        # Get the version from the previous step
         VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
 
-        # Check if the tag already exists
         if git rev-parse "v$VERSION" >/dev/null 2>&1; then
           echo "Tag v$VERSION already exists. Deleting the existing tag."
           git tag -d "v$VERSION"
           git push --delete origin "v$VERSION"
-          echo "::set-output name=tagExists::true"
+          echo "tagExists=true" >> $GITHUB_ENV
         else
           echo "No existing tag found for v$VERSION."
-          echo "::set-output name=tagExists::false"
+          echo "tagExists=false" >> $GITHUB_ENV
         fi
 
     - name: Get Version from Code
       id: version
       run: |
-        # Extract version from your code (replace this with the actual command)
         VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
-
-        echo "Version: $VERSION"
-        echo "::set-output name=version::$VERSION"
+        echo "Version=$VERSION" >> $GITHUB_ENV
     
     - name: Create Tag and Push
-      if: steps.check-tag.outputs.tagExists != 'true'
+      if: env.outputs.tagExists != 'true'
       run: |
-        # Create a tag based on the version
+        VERSION="${{ env.VERSION }}"
+
         git tag -a "v$VERSION" -m "Version $VERSION"
-        
-        # Push the tag to the repository, overwriting the existing tag
         git push origin "v$VERSION" --force
 
     - name: Check if PR exists
       id: check-pr
       run: |
-        # Get the new branch name from the workflow input
         NEW_BRANCH_NAME="${{ github.event.inputs.branchName }}"
 
-        # Check if a pull request already exists for the branch
         PR_EXISTS=$(gh pr list --base main --head "$NEW_BRANCH_NAME" --json number -q '.[].number')
 
         if [ -n "$PR_EXISTS" ]; then
           echo "Pull request already exists for $NEW_BRANCH_NAME. PR Number: $PR_EXISTS"
-          echo "::set-output name=prExists::true"
+          echo "prExists=true" >> $GITHUB_ENV
         else
           echo "No existing pull request found for $NEW_BRANCH_NAME."
-          echo "::set-output name=prExists::false"
+          echo "prExists=false" >> $GITHUB_ENV
         fi
-      env:
-        GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
 
     - name: Create Pull Request
-      if: steps.check-pr.outputs.prExists != 'true'
+      if: env.outputs.prExists != 'true'
       run: |
         gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
-      env:
-        GH_TOKEN: ${{ secrets.GIT_HUB_PAT}}
