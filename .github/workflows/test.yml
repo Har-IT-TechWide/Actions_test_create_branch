@@ -14,8 +14,8 @@ jobs:
     outputs:
       id: outputs
       value:
-        tagExists: false
-        version: ''
+        tagExists: ${{ steps.check-tag.outputs.tagExists }}
+        version: ${{ steps.version.outputs.version }}
 
     steps:
     - name: Checkout Repository
@@ -51,22 +51,22 @@ jobs:
           echo "Tag v$VERSION already exists. Deleting the existing tag."
           git tag -d "v$VERSION"
           git push --delete origin "v$VERSION"
-          echo "tagExists=false" >> $GITHUB_ENV
+          echo "::set-output name=tagExists::false"
         else
           echo "No existing tag found for v$VERSION."
-          echo "tagExists=true" >> $GITHUB_ENV
+          echo "::set-output name=tagExists::true"
         fi
 
     - name: Get Version from Code
       id: version
       run: |
         VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
-        echo "version=$VERSION" >> $GITHUB_ENV
+        echo "::set-output name=version::$VERSION"
     
     - name: Create Tag and Push
-      if: env.outputs.tagExists == 'false'
+      if: steps.check-tag.outputs.tagExists == 'true'
       run: |
-        VERSION="${{ env.version }}"
+        VERSION="${{ steps.version.outputs.version }}"
 
         git tag -a "v$VERSION" -m "Version $VERSION"
         git push origin "v$VERSION" --force
@@ -80,13 +80,13 @@ jobs:
 
         if [ -n "$PR_EXISTS" ]; then
           echo "Pull request already exists for $NEW_BRANCH_NAME. PR Number: $PR_EXISTS"
-          echo "prExists=true" >> $GITHUB_ENV
+          echo "::set-output name=prExists::true"
         else
           echo "No existing pull request found for $NEW_BRANCH_NAME."
-          echo "prExists=false" >> $GITHUB_ENV
+          echo "::set-output name=prExists::false"
         fi
 
     - name: Create Pull Request
-      if: env.outputs.prExists == 'false'
+      if: steps.check-pr.outputs.prExists == 'false'
       run: |
         gh pr create --base main --head ${{ github.event.inputs.branchName }} --title "Develop to: ${{ github.event.inputs.branchName }}" --body "This pull request was automatically created by GitHub Actions on release day."
