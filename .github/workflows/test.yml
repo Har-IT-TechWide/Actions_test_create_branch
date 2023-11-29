@@ -51,17 +51,17 @@ jobs:
           echo "Tag v$VERSION already exists. Deleting the existing tag."
           git tag -d "v$VERSION"
           git push --delete origin "v$VERSION"
-          echo "::set-output name=tagExists::false"
+          echo "tagExists=false" >> $GITHUB_ENV
         else
           echo "No existing tag found for v$VERSION."
-          echo "::set-output name=tagExists::true"
+          echo "tagExists=true" >> $GITHUB_ENV
         fi
 
     - name: Get Version from Code
       id: version
       run: |
         VERSION=$(cat gradle.properties | grep 'artifactory_version' | cut -d'=' -f2)
-        echo "::set-output name=version::$VERSION"
+        echo "version=$VERSION" >> $GITHUB_ENV
     
     - name: Create Tag and Push
       if: steps.check-tag.outputs.tagExists == 'true'
@@ -80,10 +80,10 @@ jobs:
 
         if [ -n "$PR_EXISTS" ]; then
           echo "Pull request already exists for $NEW_BRANCH_NAME. PR Number: $PR_EXISTS"
-          echo "::set-output name=prExists::true"
+          echo "prExists=true" >> $GITHUB_ENV
         else
           echo "No existing pull request found for $NEW_BRANCH_NAME."
-          echo "::set-output name=prExists::false"
+          echo "prExists=false" >> $GITHUB_ENV
         fi
 
     - name: Create Pull Request
