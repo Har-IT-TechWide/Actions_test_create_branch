@@ -80,10 +80,10 @@ jobs:
 
         if [ -n "$PR_EXISTS" ]; then
           echo "Pull request already exists for $NEW_BRANCH_NAME. PR Number: $PR_EXISTS"
-          echo "prExists=true" >> $GITHUB_ENV
+          echo "prExists=false" >> $GITHUB_ENV
         else
           echo "No existing pull request found for $NEW_BRANCH_NAME."
-          echo "prExists=false" >> $GITHUB_ENV
+          echo "prExists=true" >> $GITHUB_ENV
         fi
 
     - name: Create Pull Request
